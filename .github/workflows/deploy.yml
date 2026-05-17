@@ -70,6 +70,9 @@ jobs:
     if: needs.deploy-to-render.result == 'success' && needs.deploy-to-render.outputs.smoke_test_url != ''
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: true
 
     steps:
       - name: Wait for Render service to become healthy
