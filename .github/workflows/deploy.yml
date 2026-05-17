@@ -22,6 +22,8 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
+    outputs:
+      smoke_test_url: ${{ steps.resolve-smoke-test-url.outputs.url }}
 
     steps:
       - name: Verify Render deploy hook is configured
@@ -47,3 +49,49 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Resolve smoke test URL
+        id: resolve-smoke-test-url
+        env:
+          RENDER_SERVICE_URL: ${{ vars.RENDER_SERVICE_URL }}
+        run: |
+          if [ -z "$RENDER_SERVICE_URL" ]; then
+            echo "No RENDER_SERVICE_URL repository variable is configured."
+            echo "Post-deploy smoke test will be skipped."
+            echo "url=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Using smoke test URL: $RENDER_SERVICE_URL"
+          echo "url=$RENDER_SERVICE_URL" >> "$GITHUB_OUTPUT"
+
+  smoke-test-render:
+    needs: deploy-to-render
+    if: needs.deploy-to-render.result == 'success' && needs.deploy-to-render.outputs.smoke_test_url != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: true
+
+    steps:
+      - name: Wait for Render service to become healthy
+        env:
+          SMOKE_TEST_URL: ${{ needs.deploy-to-render.outputs.smoke_test_url }}
+        run: |
+          for attempt in $(seq 1 40); do
+            status_code=$(curl --silent --show-error --location --output /tmp/render-response.txt --write-out "%{http_code}" "$SMOKE_TEST_URL" || true)
+
+            if [ "$status_code" -ge 200 ] && [ "$status_code" -lt 400 ]; then
+              echo "Smoke test passed with HTTP $status_code on attempt $attempt."
+              exit 0
+            fi
+
+            echo "Attempt $attempt returned HTTP ${status_code:-curl-error}. Waiting for deployment to finish..."
+            sleep 15
+          done
+
+          echo "Render service did not become healthy in time."
+          echo "Last response body:"
+          cat /tmp/render-response.txt || true
+          exit 1

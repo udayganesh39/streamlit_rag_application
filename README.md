@@ -6,6 +6,7 @@ Retrieval Augmented Generative Project with UI using streamlit
 - CI runs on pull requests and pushes to `dev` and `main`
 - CD is configured to trigger a Render deploy only after CI succeeds on `dev`
 - Automatic deployment requires the GitHub Actions secret `RENDER_DEPLOY_HOOK_URL`
+- Optional post-deploy smoke testing uses the repository variable `RENDER_SERVICE_URL`
 
 ### Configure Render deployment secret
 
@@ -13,8 +14,10 @@ Retrieval Augmented Generative Project with UI using streamlit
 2. Create a new repository secret named `RENDER_DEPLOY_HOOK_URL`
 3. In Render, open your web service and copy its deploy hook URL
 4. Paste that full hook URL into the GitHub secret value
-5. Merge PRs into `dev` only after CI is green
-6. After merge, the CD workflow will trigger Render automatically
+5. Optionally create a repository variable named `RENDER_SERVICE_URL`
+6. Set `RENDER_SERVICE_URL` to your live Render service URL, for example `https://your-service.onrender.com`
+7. Merge PRs into `dev` only after CI is green
+8. After merge, the CD workflow will trigger Render automatically and run a smoke test when `RENDER_SERVICE_URL` is set
 
 ## Local quality checks
 
