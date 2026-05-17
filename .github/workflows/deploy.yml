@@ -1,20 +1,29 @@
 name: CD
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
   workflow_dispatch:
 
 jobs:
   deploy-to-render:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'dev'
+      )
     runs-on: ubuntu-latest
     environment: development
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: true
+    permissions:
+      contents: read
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
       - name: Verify Render deploy hook is configured
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
@@ -23,6 +32,15 @@ jobs:
             echo "RENDER_DEPLOY_HOOK_URL secret is not configured."
             echo "Add the Render deploy hook secret before enabling automatic deployments from dev."
             exit 1
+          fi
+
+      - name: Announce deployment target
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual deployment trigger requested."
+          else
+            echo "Deploying after successful CI on branch: ${{ github.event.workflow_run.head_branch }}"
+            echo "Validated commit: ${{ github.event.workflow_run.head_sha }}"
           fi
 
       - name: Trigger Render deployment
