@@ -2,6 +2,7 @@ import json
 import os
 from collections import defaultdict
 from pathlib import Path
+from typing import Any, cast
 
 from dotenv import find_dotenv, load_dotenv
 
@@ -17,12 +18,12 @@ try:
         GoogleGenerativeAIEmbeddings,
     )
 except ImportError:
-    PyPDFLoader = None
-    TextLoader = None
-    UnstructuredWordDocumentLoader = None
-    FAISS = None
-    ChatGoogleGenerativeAI = None
-    GoogleGenerativeAIEmbeddings = None
+    PyPDFLoader = cast(Any, None)
+    TextLoader = cast(Any, None)
+    UnstructuredWordDocumentLoader = cast(Any, None)
+    FAISS = cast(Any, None)
+    ChatGoogleGenerativeAI = cast(Any, None)  # type: ignore[misc]
+    GoogleGenerativeAIEmbeddings = cast(Any, None)  # type: ignore[misc]
 
 load_dotenv(find_dotenv())
 
