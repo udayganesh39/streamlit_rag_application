@@ -27,3 +27,19 @@ python -m ruff check .
 python -m pytest
 python -m py_compile main.py ui.py
 ```
+
+## Pre-commit hooks
+
+Install the hooks once per clone:
+
+```bash
+python -m pre_commit install
+```
+
+Run the hooks manually across the repository:
+
+```bash
+python -m pre_commit run --all-files
+```
+
+The pre-commit setup mirrors the local quality gate for formatting, linting, type-checking, and Python entrypoint validation before changes are committed.
