@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: streamlit-rag-model
+    name: streamlit-rag-application
     runtime: docker
     plan: free
     branch: dev
