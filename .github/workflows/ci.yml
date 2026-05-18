@@ -26,17 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Check formatting
-        run: python -m ruff format --check .
-
-      - name: Run lint checks
-        run: python -m ruff check .
+      - name: Run pre-commit hooks
+        run: python -m pre_commit run --all-files --show-diff-on-failure
 
       - name: Run tests with coverage
         run: python -m pytest
-
-      - name: Validate Python entrypoints
-        run: python -m py_compile main.py ui.py
 
       - name: Upload coverage report
         if: always()
