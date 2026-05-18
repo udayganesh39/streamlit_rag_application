@@ -1,5 +1,5 @@
-# streamlit_rag_model
-Retrieval Augmented Generative Project with UI using streamlit
+# streamlit_rag_application
+Retrieval-augmented generation application with a Streamlit UI.
 
 ## CI/CD
 
