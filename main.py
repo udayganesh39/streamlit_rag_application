@@ -18,10 +18,10 @@ try:
         GoogleGenerativeAIEmbeddings,
     )
 except ImportError:
-    PyPDFLoader = cast(Any, None)
-    TextLoader = cast(Any, None)
-    UnstructuredWordDocumentLoader = cast(Any, None)
-    FAISS = cast(Any, None)
+    PyPDFLoader = cast(Any, None)  # type: ignore[misc]
+    TextLoader = cast(Any, None)  # type: ignore[misc]
+    UnstructuredWordDocumentLoader = cast(Any, None)  # type: ignore[misc]
+    FAISS = cast(Any, None)  # type: ignore[misc]
     ChatGoogleGenerativeAI = cast(Any, None)  # type: ignore[misc]
     GoogleGenerativeAIEmbeddings = cast(Any, None)  # type: ignore[misc]
 
