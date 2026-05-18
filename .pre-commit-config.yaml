@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff format
+        entry: python -m ruff format
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-check
+        name: ruff check
+        entry: python -m ruff check --fix
+        language: system
+        types_or: [python, pyi]
+      - id: mypy
+        name: mypy
+        entry: python -m mypy main.py ui.py tests
+        language: system
+        pass_filenames: false
+      - id: py-compile
+        name: python compile check
+        entry: python -m py_compile main.py ui.py
+        language: system
+        pass_filenames: false
